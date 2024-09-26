@@ -372,8 +372,9 @@ impl SierraCasmRunner {
                         function_stack_depth += 1;
                         println!("Enter libfunc {}", invocation.libfunc_id);
                     } else {
-                        println!("Unmatched libfunc {}", invocation.libfunc_id);
+                        //println!("Unmatched libfunc {}", invocation.libfunc_id);
                     }
+                    println!("Stack depth {function_stack_depth}");
                 }
                 GenStatement::Return(_) => {
                     // Pop from the stack.
@@ -392,7 +393,7 @@ impl SierraCasmRunner {
                         cur_weight += popped.1;
                     }
                     function_stack_depth -= 1;
-                    println!("Exit libfunc {}", user_function_idx);
+                    println!("Exit libfunc {}, stack depth {function_stack_depth}", user_function_idx);
                 }
             }
         }
