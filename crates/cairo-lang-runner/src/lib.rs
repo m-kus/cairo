@@ -323,7 +323,9 @@ impl SierraCasmRunner {
         // runner). The header is not counted, and the footer is, but then the relevant
         // entry is removed.
         let mut sierra_statement_weights = UnorderedHashMap::default();
+        let mut step_idx = 0;
         for step in trace.iter() {
+            step_idx += 1;
             // Skip the header.
             if step.pc < real_pc_0 {
                 continue;
@@ -335,6 +337,7 @@ impl SierraCasmRunner {
             }
 
             if end_of_program_reached {
+                println!("Step {step_idx} of {}", trace.len());
                 unreachable!("End of program reached, but trace continues.");
             }
 
