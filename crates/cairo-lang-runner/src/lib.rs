@@ -370,11 +370,7 @@ impl SierraCasmRunner {
                             cur_weight = 0;
                         }
                         function_stack_depth += 1;
-                        println!("Enter libfunc {}", invocation.libfunc_id);
-                    } else {
-                        //println!("Unmatched libfunc {}", invocation.libfunc_id);
                     }
-                    println!("Stack depth {function_stack_depth}");
                 }
                 GenStatement::Return(_) => {
                     // Pop from the stack.
@@ -387,13 +383,12 @@ impl SierraCasmRunner {
 
                         let Some(popped) = function_stack.pop() else {
                             // End of the program.
-                            end_of_program_reached = true;
+                            //end_of_program_reached = true;
                             continue;
                         };
                         cur_weight += popped.1;
                     }
                     function_stack_depth -= 1;
-                    println!("Exit libfunc {}, stack depth {function_stack_depth}", user_function_idx);
                 }
             }
         }
