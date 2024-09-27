@@ -371,6 +371,17 @@ impl SierraCasmRunner {
                             cur_weight = 0;
                         }
                         function_stack_depth += 1;
+                    } else {
+                        let lf = self.sierra_program_registry.get_libfunc(&invocation.libfunc_id).unwrap();
+                        match lf {
+                            CoreConcreteLibfunc::CouponCall(cc) => {
+                                println!("Coupon call {}", cc.function);
+                            },
+                            CoreConcreteLibfunc::BranchAlign(_) => {
+                                println!("Branch align");
+                            }
+                            _ => {},
+                        } 
                     }
                 }
                 GenStatement::Return(_) => {
