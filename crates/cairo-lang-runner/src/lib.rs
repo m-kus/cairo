@@ -394,7 +394,7 @@ impl SierraCasmRunner {
                         cur_weight += popped.1;
 
                         let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
-                        let func_name = self.sierra_program.funcs[user_function_idx].to_string();
+                        let func_name = self.sierra_program.funcs[user_function_idx].id.to_string();
                         println!("--- {}/{} {} stack [{}]", user_function_idx, sierra_statement_idx, func_name, stack);
                     }
                     function_stack_depth -= 1;
