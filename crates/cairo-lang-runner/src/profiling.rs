@@ -528,7 +528,10 @@ pub fn user_function_idx_by_sierra_statement_idx(
     // The `-1` here can't cause an underflow as the first function's entry point is
     // always 0, so it is always on the left side of the partition, and thus the
     // partition index is >0.
-    sierra_program.funcs.partition_point(|f| f.entry_point.0 <= statement_idx.0) - 1
+    //sierra_program.funcs.partition_point(|f| f.entry_point.0 <= statement_idx.0) - 1
+
+    let r = sierra_program.funcs.iter().enumerate().find(|x| x.1.entry_point == statement_idx);
+    r.unwrap().0 - 1
 }
 
 /// Converts a stack trace represented as a vector of indices of functions in the sierra program to
