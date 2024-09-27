@@ -371,7 +371,7 @@ impl SierraCasmRunner {
                         function_stack_depth += 1;
 
                         let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
-                        println!("+++ {} (stmt {}) stack {} {}", user_function_idx, sierra_statement_idx, stack, invocation.libfunc_id);
+                        println!("+++ {}/{} {} stack [{}]", user_function_idx, sierra_statement_idx, invocation.libfunc_id, stack);
 
                     }
                 }
@@ -395,7 +395,7 @@ impl SierraCasmRunner {
 
                         let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
                         let func_name = self.sierra_program.funcs[user_function_idx].to_string();
-                        println!("--- {} (stmt {}) stack {} {}", user_function_idx, sierra_statement_idx, stack, func_name);
+                        println!("--- {}/{} {} stack [{}]", user_function_idx, sierra_statement_idx, func_name, stack);
                     }
                     function_stack_depth -= 1;
                 }
