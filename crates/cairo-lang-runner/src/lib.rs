@@ -371,17 +371,6 @@ impl SierraCasmRunner {
                             cur_weight = 0;
                         }
                         function_stack_depth += 1;
-                    } else {
-                        let lf = self.sierra_program_registry.get_libfunc(&invocation.libfunc_id).unwrap();
-                        match lf {
-                            CoreConcreteLibfunc::CouponCall(cc) => {
-                                println!("Coupon call {}", cc.function);
-                            },
-                            CoreConcreteLibfunc::BranchAlign(_) => {
-                                println!("Branch align");
-                            }
-                            _ => {},
-                        } 
                     }
                 }
                 GenStatement::Return(_) => {
@@ -392,13 +381,11 @@ impl SierraCasmRunner {
                             chain!(function_stack.iter().map(|f| f.0), [user_function_idx])
                                 .collect();
                         
-                        let key = cur_stack.iter().map(|x| x.to_string()).collect::<Vec::<String>>().join(":");
+                        let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
                         
                         *stack_trace_weights.entry(cur_stack).or_insert(0) += cur_weight;
 
-                        println!("--- {} {} (stmt {})", function_stack.last().unwrap_or(&(0, 0)).0, key, sierra_statement_idx);
-
-                        //println!("<<< [{user_function_idx}, {sierra_statement_idx}]", );
+                        println!("--- {} (stmt {}) stack {}", user_function_idx, sierra_statement_idx, stack);
 
                         let Some(popped) = function_stack.pop() else {
                             // End of the program.
