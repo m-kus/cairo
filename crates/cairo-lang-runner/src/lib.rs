@@ -363,7 +363,7 @@ impl SierraCasmRunner {
                         self.sierra_program_registry.get_libfunc(&invocation.libfunc_id),
                         Ok(CoreConcreteLibfunc::FunctionCall(_))
                     ) {
-                        println!("+++ {} {}", user_function_idx, invocation.libfunc_id);
+                        println!("+++ {} (stmt {}) {}", user_function_idx, sierra_statement_idx, invocation.libfunc_id);
 
                         // Push to the stack.
                         if function_stack_depth < profiling_config.max_stack_trace_depth {
@@ -385,7 +385,7 @@ impl SierraCasmRunner {
                         
                         *stack_trace_weights.entry(cur_stack).or_insert(0) += cur_weight;
 
-                        println!("--- {} {}", function_stack.last().unwrap().0, key);
+                        println!("--- {} {} (stmt {})", function_stack.last().unwrap_or(&(0, 0)).0, key, sierra_statement_idx);
 
                         //println!("<<< [{user_function_idx}, {sierra_statement_idx}]", );
 
