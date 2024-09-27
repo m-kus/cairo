@@ -25,7 +25,7 @@ pub struct ProfilingInfo {
     /// as a vector of indices of the functions in the stack (indices of the functions according to
     /// the list in the sierra program).
     /// The value is the weight of the stack trace.
-    pub stack_trace_weights: UnorderedHashMap<Vec<usize>, usize>,
+    pub stack_trace_weights: OrderedHashMap<Vec<usize>, usize>,
 }
 
 /// Weights per libfunc.
@@ -308,9 +308,7 @@ impl<'a> ProfilingInfoProcessor<'a> {
         let sierra_stack_trace_weights = params.process_by_stack_trace.then(|| {
             raw_profiling_info
                 .stack_trace_weights
-                .iter_sorted_by_key(|(idx_stack_trace, weight)| {
-                    (usize::MAX - **weight, (*idx_stack_trace).clone())
-                })
+                .iter()
                 .map(|(idx_stack_trace, weight)| {
                     (
                         index_stack_trace_to_name_stack_trace(
@@ -327,15 +325,15 @@ impl<'a> ProfilingInfoProcessor<'a> {
             let db = self.db.expect("DB must be set with `process_by_cairo_stack_trace=true`.");
             raw_profiling_info
                 .stack_trace_weights
-                .filter_cloned(|trace, _| is_cairo_trace(db, &self.sierra_program, trace))
-                .into_iter_sorted_by_key(|(trace, weight)| (usize::MAX - *weight, trace.clone()))
+                .iter()
+                .filter(|(trace, _)| is_cairo_trace(db, &self.sierra_program, trace))
                 .map(|(idx_stack_trace, weight)| {
                     (
                         index_stack_trace_to_name_stack_trace(
                             &self.sierra_program,
                             &idx_stack_trace,
                         ),
-                        weight,
+                        *weight,
                     )
                 })
                 .collect()
