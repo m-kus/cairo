@@ -363,14 +363,16 @@ impl SierraCasmRunner {
                         self.sierra_program_registry.get_libfunc(&invocation.libfunc_id),
                         Ok(CoreConcreteLibfunc::FunctionCall(_))
                     ) {
-                        println!("+++ {} (stmt {}) {}", user_function_idx, sierra_statement_idx, invocation.libfunc_id);
-
                         // Push to the stack.
                         if function_stack_depth < profiling_config.max_stack_trace_depth {
                             function_stack.push((user_function_idx, cur_weight));
                             cur_weight = 0;
                         }
                         function_stack_depth += 1;
+
+                        let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
+                        println!("+++ {} (stmt {}) stack {} {}", user_function_idx, sierra_statement_idx, stack, invocation.libfunc_id);
+
                     }
                 }
                 GenStatement::Return(_) => {
@@ -380,19 +382,20 @@ impl SierraCasmRunner {
                         let cur_stack: Vec<_> =
                             chain!(function_stack.iter().map(|f| f.0), [user_function_idx])
                                 .collect();
-                        
-                        let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
-                        
+                          
                         *stack_trace_weights.entry(cur_stack).or_insert(0) += cur_weight;
 
-                        println!("--- {} (stmt {}) stack {}", user_function_idx, sierra_statement_idx, stack);
-
+                     
                         let Some(popped) = function_stack.pop() else {
                             // End of the program.
                             //end_of_program_reached = true;
                             continue;
                         };
                         cur_weight += popped.1;
+
+                        let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
+                        let func_name = self.sierra_program.funcs[user_function_idx].to_string();
+                        println!("--- {} (stmt {}) stack {} {}", user_function_idx, sierra_statement_idx, stack, func_name);
                     }
                     function_stack_depth -= 1;
                 }
