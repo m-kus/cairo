@@ -531,7 +531,10 @@ pub fn user_function_idx_by_sierra_statement_idx(
     //sierra_program.funcs.partition_point(|f| f.entry_point.0 <= statement_idx.0) - 1
 
     let r = sierra_program.funcs.iter().enumerate().find(|x| x.1.entry_point == statement_idx);
-    r.unwrap().0 - 1
+    match r {
+        Some(v) => v.0 - 1,
+        None => 0
+    }
 }
 
 /// Converts a stack trace represented as a vector of indices of functions in the sierra program to
