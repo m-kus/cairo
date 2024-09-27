@@ -364,7 +364,7 @@ impl SierraCasmRunner {
                         Ok(CoreConcreteLibfunc::FunctionCall(_))
                     ) {
                         let stack = function_stack.iter().map(|x: &(usize, usize)| x.0.to_string()).collect::<Vec::<String>>().join(":");
-                        println!("+++ {} (stmt {}) {} stack [{}]", user_function_idx, sierra_statement_idx, invocation.libfunc_id, stack);
+                        println!("+++ {} (stmt {}, {} branches) {} stack [{}]", user_function_idx, sierra_statement_idx, invocation.branches.len(), invocation.libfunc_id, stack);
 
                         // Push to the stack.
                         if function_stack_depth < profiling_config.max_stack_trace_depth {
@@ -386,7 +386,7 @@ impl SierraCasmRunner {
 
                         let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
                         let func_name = self.sierra_program.funcs[user_function_idx].id.to_string();
-                        println!("--- {} (stmt{}) {} stack [{}]", user_function_idx, sierra_statement_idx, func_name, stack);
+                        println!("--- {} (stmt {}) {} stack [{}]", user_function_idx, sierra_statement_idx, func_name, stack);
 
                         let Some(popped) = function_stack.pop() else {
                             // End of the program.
