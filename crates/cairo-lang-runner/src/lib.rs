@@ -363,7 +363,7 @@ impl SierraCasmRunner {
                         self.sierra_program_registry.get_libfunc(&invocation.libfunc_id),
                         Ok(CoreConcreteLibfunc::FunctionCall(_))
                     ) {
-                        let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
+                        let stack = function_stack.iter().map(|x: &(usize, usize)| x.0.to_string()).collect::<Vec::<String>>().join(":");
                         println!("+++ {} (stmt {}) {} stack [{}]", user_function_idx, sierra_statement_idx, invocation.libfunc_id, stack);
 
                         // Push to the stack.
