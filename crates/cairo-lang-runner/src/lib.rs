@@ -364,7 +364,7 @@ impl SierraCasmRunner {
                         Ok(CoreConcreteLibfunc::FunctionCall(_))
                     ) {
                         let stack = function_stack.iter().map(|x: &(usize, usize)| x.0.to_string()).collect::<Vec::<String>>().join(":");
-                        println!("+++ {} (stmt {}, {} branches) {} stack [{}]", user_function_idx, sierra_statement_idx, invocation.branches.len(), invocation.libfunc_id, stack);
+                        println!("+++ {} (stmt {}) {} stack [{}]", user_function_idx, sierra_statement_idx, invocation.libfunc_id, stack);
 
                         // Push to the stack.
                         if function_stack_depth < profiling_config.max_stack_trace_depth {
@@ -372,6 +372,10 @@ impl SierraCasmRunner {
                             cur_weight = 0;
                         }
                         function_stack_depth += 1;
+                    } else {
+                        if invocation.branches.len() > 1 {
+                            println!("AHAAAA {}", invocation.branches[1].target);
+                        }
                     }
                 }
                 GenStatement::Return(_) => {
