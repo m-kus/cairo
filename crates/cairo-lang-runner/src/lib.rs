@@ -10,7 +10,7 @@ use cairo_lang_sierra::extensions::bitwise::BitwiseType;
 use cairo_lang_sierra::extensions::circuit::{AddModType, MulModType};
 use cairo_lang_sierra::extensions::core::{CoreConcreteLibfunc, CoreLibfunc, CoreType};
 use cairo_lang_sierra::extensions::ec::EcOpType;
-use cairo_lang_sierra::extensions::enm::{EnumConcreteLibfunc, EnumType};
+use cairo_lang_sierra::extensions::enm::EnumType;
 use cairo_lang_sierra::extensions::gas::{CostTokenType, GasBuiltinType};
 use cairo_lang_sierra::extensions::pedersen::PedersenType;
 use cairo_lang_sierra::extensions::poseidon::PoseidonType;
@@ -44,6 +44,7 @@ use itertools::chain;
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
 use profiling::{user_function_idx_by_sierra_statement_idx, ProfilingInfo};
+use smol_str::SmolStr;
 use starknet_types_core::felt::Felt as Felt252;
 use thiserror::Error;
 
@@ -323,9 +324,7 @@ impl SierraCasmRunner {
         // runner). The header is not counted, and the footer is, but then the relevant
         // entry is removed.
         let mut sierra_statement_weights = UnorderedHashMap::default();
-        let mut step_idx = 0;
         for step in trace.iter() {
-            step_idx += 1;
             // Skip the header.
             if step.pc < real_pc_0 {
                 continue;
@@ -372,19 +371,9 @@ impl SierraCasmRunner {
                             cur_weight = 0;
                         }
                         function_stack_depth += 1;
-                    } else {
-                        match self.sierra_program_registry.get_libfunc(&invocation.libfunc_id) {
-                            Ok(CoreConcreteLibfunc::Enum(EnumConcreteLibfunc::Match(_))) => {
-                                println!("+++ {} (stmt {}) {}", user_function_idx, sierra_statement_idx, invocation.libfunc_id);
-                                function_stack.push((user_function_idx, cur_weight));
-                                cur_weight = 0;
-                                function_stack_depth += 1;
-                            },
-                            _ => {},
-                        }
                     }
                 }
-                GenStatement::Return(_) => {
+                GenStatement::Return(ret) => {
                     // Pop from the stack.
                     if function_stack_depth <= profiling_config.max_stack_trace_depth {
                         // The current stack trace, including the current function.
@@ -396,7 +385,8 @@ impl SierraCasmRunner {
 
                         let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
                         let func_name = self.sierra_program.funcs[user_function_idx].id.to_string();
-                        println!("--- {} (stmt {}) {} stack [{}]", user_function_idx, sierra_statement_idx, func_name, stack);
+                        let ret = ret.iter().map(|x| x.debug_name.clone().unwrap_or_default()).collect::<Vec::<SmolStr>>().join(", ");
+                        println!("--- {} (stmt {}) {} stack [{}] ret [{}]", user_function_idx, sierra_statement_idx, func_name, stack, ret);
 
                         let Some(popped) = function_stack.pop() else {
                             // End of the program.
