@@ -44,7 +44,7 @@ use itertools::chain;
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
 use profiling::{user_function_idx_by_sierra_statement_idx, ProfilingInfo};
-use smol_str::SmolStr;
+use smol_str::{SmolStr, ToSmolStr};
 use starknet_types_core::felt::Felt as Felt252;
 use thiserror::Error;
 
@@ -385,7 +385,7 @@ impl SierraCasmRunner {
 
                         let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
                         let func_name = self.sierra_program.funcs[user_function_idx].id.to_string();
-                        let ret = ret.iter().map(|x| x.debug_name.clone().unwrap_or_default()).collect::<Vec::<SmolStr>>().join(", ");
+                        let ret = ret.iter().map(|x| x.debug_name.clone().unwrap_or(x.id.to_smolstr())).collect::<Vec::<SmolStr>>().join(":");
                         println!("--- {} (stmt {}) {} stack [{}] ret [{}]", user_function_idx, sierra_statement_idx, func_name, stack, ret);
 
                         let Some(popped) = function_stack.pop() else {
