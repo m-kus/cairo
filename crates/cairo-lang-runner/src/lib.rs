@@ -44,7 +44,6 @@ use itertools::chain;
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
 use profiling::{user_function_idx_by_sierra_statement_idx, ProfilingInfo};
-use smol_str::{SmolStr, ToSmolStr};
 use starknet_types_core::felt::Felt as Felt252;
 use thiserror::Error;
 
@@ -291,6 +290,9 @@ impl SierraCasmRunner {
         let sierra_len = self.casm_program.debug_info.sierra_statement_info.len();
         let bytecode_len =
             self.casm_program.debug_info.sierra_statement_info.last().unwrap().end_offset;
+
+        println!("Bytecode len {bytecode_len}, Sierra statements num {sierra_len}");
+
         // The CASM program starts with a header of instructions to wrap the real program.
         // `real_pc_0` is the PC in the trace that points to the same CASM instruction which is in
         // the real PC=0 in the original CASM program. That is, all trace's PCs need to be
@@ -363,7 +365,7 @@ impl SierraCasmRunner {
                         Ok(CoreConcreteLibfunc::FunctionCall(_))
                     ) {
                         let stack = function_stack.iter().map(|x: &(usize, usize)| x.0.to_string()).collect::<Vec::<String>>().join(":");
-                        println!("+++ {} (stmt {}) {} stack [{}]", user_function_idx, sierra_statement_idx, invocation.libfunc_id, stack);
+                        println!("+++ {} (stmt {}, pc {}) {} stack [{}]", user_function_idx, sierra_statement_idx, real_pc, invocation.libfunc_id, stack);
 
                         // Push to the stack.
                         if function_stack_depth < profiling_config.max_stack_trace_depth {
@@ -373,7 +375,7 @@ impl SierraCasmRunner {
                         function_stack_depth += 1;
                     }
                 }
-                GenStatement::Return(ret) => {
+                GenStatement::Return(_) => {
                     // Pop from the stack.
                     if function_stack_depth <= profiling_config.max_stack_trace_depth {
                         // The current stack trace, including the current function.
@@ -385,12 +387,11 @@ impl SierraCasmRunner {
 
                         let stack = function_stack.iter().map(|x| x.0.to_string()).collect::<Vec::<String>>().join(":");
                         let func_name = self.sierra_program.funcs[user_function_idx].id.to_string();
-                        let ret = ret.iter().map(|x| x.debug_name.clone().unwrap_or(x.id.to_smolstr())).collect::<Vec::<SmolStr>>().join(":");
-                        println!("--- {} (stmt {}) {} stack [{}] ret [{}]", user_function_idx, sierra_statement_idx, func_name, stack, ret);
+                        println!("--- {} (stmt {}, pc {}) {} stack [{}]", user_function_idx, sierra_statement_idx, real_pc, func_name, stack);
 
                         let Some(popped) = function_stack.pop() else {
                             // End of the program.
-                            //end_of_program_reached = true;
+                            end_of_program_reached = true;
                             continue;
                         };
                         cur_weight += popped.1;
