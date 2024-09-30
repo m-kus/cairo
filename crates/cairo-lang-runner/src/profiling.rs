@@ -7,6 +7,7 @@ use cairo_lang_sierra_generator::db::SierraGenGroup;
 use cairo_lang_utils::ordered_hash_map::OrderedHashMap;
 use cairo_lang_utils::unordered_hash_map::UnorderedHashMap;
 use cairo_lang_utils::{require, LookupIntern};
+use itertools::Itertools;
 use smol_str::SmolStr;
 
 #[cfg(test)]
@@ -25,7 +26,8 @@ pub struct ProfilingInfo {
     /// as a vector of indices of the functions in the stack (indices of the functions according to
     /// the list in the sierra program).
     /// The value is the weight of the stack trace.
-    pub stack_trace_weights: UnorderedHashMap<Vec<usize>, usize>,
+    /// The stack trace entries are sorted in the order they occur.
+    pub stack_trace_weights: OrderedHashMap<Vec<usize>, usize>,
 }
 
 /// Weights per libfunc.
@@ -205,6 +207,9 @@ pub struct ProfilingInfoProcessorParams {
     /// Whether to process the profiling info by Cairo stack trace (that is, no generated
     /// functions in the traces).
     pub process_by_cairo_stack_trace: bool,
+    /// Whether to sort Sierra stack trace items by weight (desc) and stack entry (asc),
+    /// alternatively the original order is preserved.
+    pub sort_sierra_stack_trace: bool,
 }
 impl Default for ProfilingInfoProcessorParams {
     fn default() -> Self {
@@ -218,6 +223,7 @@ impl Default for ProfilingInfoProcessorParams {
             process_by_cairo_function: true,
             process_by_stack_trace: true,
             process_by_cairo_stack_trace: true,
+            sort_sierra_stack_trace: true,
         }
     }
 }
@@ -309,39 +315,31 @@ impl<'a> ProfilingInfoProcessor<'a> {
         raw_profiling_info: &ProfilingInfo,
         params: &ProfilingInfoProcessorParams,
     ) -> StackTraceWeights {
+        let resolve_names = |(idx_stack_trace, weight): (&Vec<usize>, &usize)| {
+            (index_stack_trace_to_name_stack_trace(&self.sierra_program, &idx_stack_trace), *weight)
+        };
+
         let sierra_stack_trace_weights = params.process_by_stack_trace.then(|| {
-            raw_profiling_info
-                .stack_trace_weights
-                .iter_sorted_by_key(|(idx_stack_trace, weight)| {
-                    (usize::MAX - **weight, (*idx_stack_trace).clone())
-                })
-                .map(|(idx_stack_trace, weight)| {
-                    (
-                        index_stack_trace_to_name_stack_trace(
-                            &self.sierra_program,
-                            idx_stack_trace,
-                        ),
-                        *weight,
-                    )
-                })
-                .collect()
+            if params.sort_sierra_stack_trace {
+                raw_profiling_info
+                    .stack_trace_weights
+                    .iter()
+                    .sorted_by_key(|&(trace, weight)| (usize::MAX - *weight, trace.clone()))
+                    .map(resolve_names)
+                    .collect()
+            } else {
+                raw_profiling_info.stack_trace_weights.iter().map(resolve_names).collect()
+            }
         });
 
         let cairo_stack_trace_weights = params.process_by_cairo_stack_trace.then(|| {
             let db = self.db.expect("DB must be set with `process_by_cairo_stack_trace=true`.");
             raw_profiling_info
                 .stack_trace_weights
-                .filter_cloned(|trace, _| is_cairo_trace(db, &self.sierra_program, trace))
-                .into_iter_sorted_by_key(|(trace, weight)| (usize::MAX - *weight, trace.clone()))
-                .map(|(idx_stack_trace, weight)| {
-                    (
-                        index_stack_trace_to_name_stack_trace(
-                            &self.sierra_program,
-                            &idx_stack_trace,
-                        ),
-                        weight,
-                    )
-                })
+                .iter()
+                .filter(|(trace, _)| is_cairo_trace(db, &self.sierra_program, trace))
+                .sorted_by_key(|&(trace, weight)| (usize::MAX - *weight, trace.clone()))
+                .map(resolve_names)
                 .collect()
         });
 
