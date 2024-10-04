@@ -333,7 +333,7 @@ impl SierraCasmRunner {
             }
             let real_pc: usize = step.pc.sub(real_pc_0);
             // Skip the footer.
-            if real_pc == bytecode_len {
+            if real_pc >= bytecode_len {
                 continue;
             }
 
