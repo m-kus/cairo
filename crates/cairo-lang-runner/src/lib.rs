@@ -53,6 +53,9 @@ pub mod casm_run;
 pub mod profiling;
 pub mod short_string;
 
+#[cfg(test)]
+pub mod runner_test;
+
 const MAX_STACK_TRACE_DEPTH_DEFAULT: usize = 100;
 
 #[derive(Debug, Error)]
