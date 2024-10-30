@@ -331,6 +331,9 @@ impl SierraCasmRunner {
             if step.pc < real_pc_0 {
                 continue;
             }
+
+            cur_weight += 1;
+
             let real_pc: usize = step.pc.sub(real_pc_0);
             // Skip the footer.
             // Also if pc is greater or equal the bytecode length it means that it is the outside
@@ -343,8 +346,6 @@ impl SierraCasmRunner {
             if end_of_program_reached {
                 unreachable!("End of program reached, but trace continues.");
             }
-
-            cur_weight += 1;
 
             // TODO(yuval): Maintain a map of pc to sierra statement index (only for PCs we saw), to
             // save lookups.
