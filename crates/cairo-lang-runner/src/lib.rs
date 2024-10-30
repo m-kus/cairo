@@ -389,7 +389,7 @@ impl SierraCasmRunner {
                             end_of_program_reached = true;
                             continue;
                         };
-                        cur_weight += popped.1;
+                        cur_weight = popped.1;
                     }
                     function_stack_depth -= 1;
                 }
