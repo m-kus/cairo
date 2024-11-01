@@ -382,9 +382,14 @@ impl SierraCasmRunner {
                     // Pop from the stack.
                     if function_stack_depth <= profiling_config.max_stack_trace_depth {
                         // The current stack trace, including the current function.
-                        let cur_stack: Vec<_> =
+                        let mut cur_stack: Vec<_> =
                             chain!(function_stack.iter().map(|f| f.0), [user_function_idx])
                                 .collect();
+
+                        if profiling_config.stack_trace_collapse_recursion {
+                            cur_stack.dedup();
+                        }
+
                         *stack_trace_weights.entry(cur_stack).or_insert(0) += cur_weight;
 
                         let Some(popped) = function_stack.pop() else {
@@ -392,7 +397,12 @@ impl SierraCasmRunner {
                             end_of_program_reached = true;
                             continue;
                         };
-                        cur_weight += popped.1;
+
+                        if profiling_config.stack_trace_self_weight {
+                            cur_weight = popped.1;
+                        } else {
+                            cur_weight += popped.1;
+                        }
                     }
                     function_stack_depth -= 1;
                 }
@@ -802,7 +812,12 @@ impl SierraCasmRunner {
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct ProfilingInfoCollectionConfig {
     /// The maximum depth of the stack trace to collect.
-    max_stack_trace_depth: usize,
+    pub max_stack_trace_depth: usize,
+    /// If this flag is set, stack trace items will include measurement of steps
+    /// spent within a particular function invocation *excluding* any other calls inside it.
+    pub stack_trace_self_weight: bool,
+    /// If this flag is set, recursive calls and loops will be flattened and aggregated.
+    pub stack_trace_collapse_recursion: bool,
 }
 
 impl ProfilingInfoCollectionConfig {
@@ -828,6 +843,8 @@ impl Default for ProfilingInfoCollectionConfig {
             } else {
                 MAX_STACK_TRACE_DEPTH_DEFAULT
             },
+            stack_trace_self_weight: false,
+            stack_trace_collapse_recursion: false,
         }
     }
 }
