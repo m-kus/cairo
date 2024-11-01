@@ -48,6 +48,7 @@ use num_traits::ToPrimitive;
 use profiling::{ProfilingInfo, user_function_idx_by_sierra_statement_idx};
 use starknet_types_core::felt::Felt as Felt252;
 use thiserror::Error;
+use itertools::Itertools;
 
 use crate::casm_run::RunFunctionResult;
 
@@ -252,6 +253,11 @@ impl SierraCasmRunner {
         let assembled_program = self.casm_program.clone().assemble_ex(&entry_code, &footer);
         let (hints_dict, string_to_hint) = build_hints_dict(&assembled_program.hints);
 
+        let entry = entry_code.iter().map(|i| format!("{}", i)).join("\n");
+        println!("Enry code:\n{}\n", entry);
+
+        println!("\nAssembly: {:?}", assembled_program.bytecode);
+
         let mut hint_processor = CairoHintProcessor {
             runner: Some(self),
             starknet_state,
@@ -382,14 +388,14 @@ impl SierraCasmRunner {
                         let cur_stack: Vec<_> =
                             chain!(function_stack.iter().map(|f| f.0), [user_function_idx])
                                 .collect();
-                        *stack_trace_weights.entry(cur_stack).or_insert(0) += cur_weight;
+                        stack_trace_weights.insert(cur_stack, cur_weight);
 
                         let Some(popped) = function_stack.pop() else {
                             // End of the program.
                             end_of_program_reached = true;
                             continue;
                         };
-                        cur_weight += popped.1;
+                        cur_weight = popped.1;
                     }
                     function_stack_depth -= 1;
                 }
