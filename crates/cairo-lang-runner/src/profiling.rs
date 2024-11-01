@@ -28,6 +28,10 @@ pub struct ProfilingInfo {
     /// The value is the weight of the stack trace.
     /// The stack trace entries are sorted in the order they occur.
     pub stack_trace_weights: OrderedHashMap<Vec<usize>, usize>,
+
+    /// The number of steps in the trace that originated from each sierra statement
+    /// combined with information about the current call stack.
+    pub scoped_sierra_statement_weights: OrderedHashMap<(Vec<usize>, StatementIdx), usize>,
 }
 
 /// Weights per libfunc.
