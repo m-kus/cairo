@@ -249,6 +249,11 @@ impl SierraCasmRunner {
     ) -> Result<RunResultStarknet, RunnerError> {
         let initial_gas = self.get_initial_available_gas(func, available_gas)?;
         let (entry_code, builtins) = self.create_entry_code(func)?;
+        
+        for instr in entry_code.iter() {
+            println!("{instr}");
+        }
+
         let footer = Self::create_code_footer();
         let assembled_program = self.casm_program.clone().assemble_ex(&entry_code, &footer);
         let (hints_dict, string_to_hint) = build_hints_dict(&assembled_program.hints);
