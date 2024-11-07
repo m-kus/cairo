@@ -1,3 +1,7 @@
+use std::fs;
+use std::path::PathBuf;
+
+use cairo_lang_sierra::program::Program;
 use cairo_lang_sierra::ProgramParser;
 use cairo_lang_test_utils::parse_test_file::TestRunnerResult;
 use cairo_lang_utils::ordered_hash_map::OrderedHashMap;
@@ -821,4 +825,30 @@ fn compiler_errors(
         Err(err) => err.to_string(),
     };
     TestRunnerResult::success(OrderedHashMap::from([("error".into(), error_str)]))
+}
+
+#[test]
+fn test_no_gas_ap_changes() {
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).parent().unwrap().to_owned();
+    path.extend(["cairo-lang-sierra-to-casm", "src", "test_data", "client2.sierra.json"]);
+    
+    let src = fs::read_to_string(path).unwrap();
+    let program: Program = serde_json::from_str(&src).unwrap();
+
+    let gas_usage_check = false;
+
+    let metadata = if gas_usage_check {
+        calc_metadata(&program, Default::default()).unwrap_or_default()
+    } else {
+        calc_metadata_ap_change_only(&program).unwrap_or_default()
+    };
+
+    println!("{}", metadata.ap_change_info);
+    
+    let res = compile(
+        &program,
+        &metadata,
+        // `max_bytecode_size` is a small value to ensure we can pass with small values.
+        SierraToCasmConfig { gas_usage_check, max_bytecode_size: 10000000 }
+    ).unwrap();
 }

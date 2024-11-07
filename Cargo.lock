@@ -940,6 +940,7 @@ dependencies = [
  "num-bigint",
  "num-traits 0.2.19",
  "pretty_assertions",
+ "serde_json",
  "starknet-types-core",
  "test-case",
  "test-log",

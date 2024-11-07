@@ -32,7 +32,7 @@ pub enum MetadataError {
 }
 
 /// Configuration for metadata computation.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct MetadataComputationConfig {
     /// Functions to enforce costs for, as well as the costs to enforce.
     pub function_set_costs: OrderedHashMap<FunctionId, OrderedHashMap<CostTokenType, i32>>,
@@ -81,6 +81,7 @@ pub fn calc_metadata(
     program: &Program,
     config: MetadataComputationConfig,
 ) -> Result<Metadata, MetadataError> {
+    println!("{:?}", config);
     let pre_function_set_costs = config
         .function_set_costs
         .iter()
