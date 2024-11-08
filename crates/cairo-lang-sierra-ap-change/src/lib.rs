@@ -115,6 +115,9 @@ pub fn calc_ap_changes<TokenUsages: Fn(StatementIdx, CostTokenType) -> usize>(
     let mut variable_values = OrderedHashMap::default();
     let mut function_ap_change = OrderedHashMap::default();
     for (var, value) in solution {
+        // if value == 0 {
+        //     continue;
+        // }
         match var {
             Var::LibfuncImplicitApChangeVariable(idx) => {
                 variable_values.insert(idx, value as usize)

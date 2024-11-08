@@ -429,7 +429,7 @@ impl ProgramAnnotations {
             None => ApTracking::Disabled,
         };
         if annotations.environment.ap_tracking != expected_ap_tracking {
-            println!("Func {:?}\nAP tracking {:?}\nAnnots {:?}", func, metadata.ap_change_info.function_ap_change.get(&func.id), annotations);
+            println!("Func {:?}\n\nAP tracking {:?}\n\nAnnots {:?}", func, metadata.ap_change_info.function_ap_change.get(&func.id), annotations);
 
             return Err(AnnotationError::InvalidFunctionApChange {
                 statement_idx,

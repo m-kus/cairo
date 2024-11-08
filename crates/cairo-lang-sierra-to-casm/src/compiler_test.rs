@@ -830,7 +830,7 @@ fn compiler_errors(
 #[test]
 fn test_no_gas_ap_changes() {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).parent().unwrap().to_owned();
-    path.extend(["cairo-lang-sierra-to-casm", "src", "test_data", "client2.sierra.json"]);
+    path.extend(["cairo-lang-sierra-to-casm", "src", "test_data", "shinigami_cmds.sierra.json"]);
     
     let src = fs::read_to_string(path).unwrap();
     let program: Program = serde_json::from_str(&src).unwrap();
@@ -843,7 +843,7 @@ fn test_no_gas_ap_changes() {
         calc_metadata_ap_change_only(&program).unwrap_or_default()
     };
 
-    println!("{}", metadata.ap_change_info);
+    //println!("{}", metadata.ap_change_info);
     
     let res = compile(
         &program,
