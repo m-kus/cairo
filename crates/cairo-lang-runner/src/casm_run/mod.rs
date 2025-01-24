@@ -652,7 +652,8 @@ impl CairoHintProcessor<'_> {
         let system_ptr = extract_relocatable(vm, system)?;
         let mut system_buffer = MemBuffer::new(vm, system_ptr);
         let selector = system_buffer.next_felt252()?.to_bytes_be();
-        let mut gas_counter = system_buffer.next_usize()?;
+        let _ = system_buffer.next();
+        let mut gas_counter = 9999999999; //system_buffer.next_usize()?;
         let mut execute_handle_helper =
             |handler: &mut dyn FnMut(
                 // The syscall buffer.
@@ -662,12 +663,12 @@ impl CairoHintProcessor<'_> {
             ) -> Result<SyscallResult, HintError>| {
                 match handler(&mut system_buffer, &mut gas_counter)? {
                     SyscallResult::Success(values) => {
-                        system_buffer.write(gas_counter)?;
+                        system_buffer.write(0)?;
                         system_buffer.write(Felt252::from(0))?;
                         system_buffer.write_data(values.into_iter())?;
                     }
                     SyscallResult::Failure(revert_reason) => {
-                        system_buffer.write(gas_counter)?;
+                        system_buffer.write(0)?;
                         system_buffer.write(Felt252::from(1))?;
                         system_buffer.write_arr(revert_reason.into_iter())?;
                     }
