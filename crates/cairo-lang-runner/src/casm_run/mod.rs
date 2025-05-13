@@ -2311,7 +2311,7 @@ pub fn run_function_with_runner(
     additional_initialization(&mut runner.vm)?;
 
     runner.run_until_pc(end, hint_processor).map_err(CairoRunError::from)?;
-    runner.end_run(true, false, hint_processor).map_err(CairoRunError::from)?;
+    runner.end_run(true, false, hint_processor, true).map_err(CairoRunError::from)?;
     runner.relocate(true).map_err(CairoRunError::from)?;
     Ok(())
 }
