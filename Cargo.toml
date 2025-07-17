@@ -95,7 +95,7 @@ license = "Apache-2.0"
 license-file = "LICENSE"
 repository = "https://github.com/starkware-libs/cairo/"
 rust-version = "1.86"
-version = "2.14.0"
+version = "2.14.1-dev.0"
 
 [workspace.dependencies]
 anyhow = "1.0.98"
@@ -107,8 +107,11 @@ assert_matches = "1.5"
 bimap = "0.6.3"
 bincode = { version = "2", features = ["serde"] }
 cairo-lang-primitive-token = "1"
-cairo-vm = { version = "3.0.0", features = ["mod_builtin"] }
-clap = { version = "4.5.42", features = ["derive"] }
+cairo-vm = { git = "https://github.com/m-kus/cairo-vm.git", rev = "c9aa51b9360a6c89389cf88c93ac30b5213e64a7", features = [
+    "mod_builtin",
+    "clap",
+] }
+clap = { version = "4.5.29", features = ["derive"] }
 colored = "3.0.0"
 const-fnv1a-hash = "1.1.0"
 const_format = "0.2.34"
