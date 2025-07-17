@@ -377,6 +377,7 @@ impl EntryCodeHelper {
             (BuiltinName::bitwise, BitwiseType::ID),
             (BuiltinName::range_check, RangeCheckType::ID),
             (BuiltinName::pedersen, PedersenType::ID),
+            (BuiltinName::system, SystemType::ID),
         ] {
             if param_types.iter().any(|(ty, _)| ty == &builtin_ty) {
                 self.input_builtin_vars.insert(
@@ -441,16 +442,6 @@ impl EntryCodeHelper {
             if let Some(name) = self.builtin_ty_to_vm_name.get(generic_ty).cloned() {
                 let var = self.input_builtin_vars[&name];
                 casm_build_extend!(self.ctx, tempvar _builtin = var;);
-            } else if self.emulated_builtins.contains(generic_ty) {
-                assert!(
-                    self.config.allow_unsound,
-                    "Cannot support emulated builtins if not configured to `allow_unsound`."
-                );
-                casm_build_extend! {self.ctx,
-                    tempvar system;
-                    hint AllocSegment into {dst: system};
-                };
-                unallocated_count += ty_size;
             } else if self.config.testing {
                 if *ty_size > 0 {
                     casm_build_extend! {self.ctx,
@@ -564,7 +555,7 @@ impl EntryCodeHelper {
     /// Handles `SegmentArena` validation.
     fn validate_segment_arena(&mut self) {
         let segment_arena =
-            self.output_builtin_vars.swap_remove(&BuiltinName::segment_arena).unwrap();
+            self.output_builtin_vars.shift_remove(&BuiltinName::segment_arena).unwrap();
         casm_build_extend! {self.ctx,
             tempvar n_segments = segment_arena[-2];
             tempvar n_finalized = segment_arena[-1];
