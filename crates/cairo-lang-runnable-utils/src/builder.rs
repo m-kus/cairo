@@ -361,7 +361,7 @@ impl EntryCodeHelper {
             has_post_calculation_loop: false,
             local_exprs: vec![],
             output_builtin_vars: OrderedHashMap::default(),
-            emulated_builtins: UnorderedHashSet::<_>::from_iter([SystemType::ID]),
+            emulated_builtins: UnorderedHashSet::default(),
         }
     }
 
@@ -377,6 +377,7 @@ impl EntryCodeHelper {
             (BuiltinName::bitwise, BitwiseType::ID),
             (BuiltinName::range_check, RangeCheckType::ID),
             (BuiltinName::pedersen, PedersenType::ID),
+            (BuiltinName::system, SystemType::ID),
         ] {
             if param_types.iter().any(|(ty, _)| ty == &builtin_ty) {
                 self.input_builtin_vars.insert(
@@ -564,7 +565,7 @@ impl EntryCodeHelper {
     /// Handles `SegmentArena` validation.
     fn validate_segment_arena(&mut self) {
         let segment_arena =
-            self.output_builtin_vars.swap_remove(&BuiltinName::segment_arena).unwrap();
+            self.output_builtin_vars.shift_remove(&BuiltinName::segment_arena).unwrap();
         casm_build_extend! {self.ctx,
             tempvar n_segments = segment_arena[-2];
             tempvar n_finalized = segment_arena[-1];
