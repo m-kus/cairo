@@ -112,6 +112,7 @@ pub fn token_gas_cost(token_type: CostTokenType) -> usize {
         }
         CostTokenType::Pedersen => 4050,
         CostTokenType::Poseidon => 491,
+        CostTokenType::Sha256 => 1852, // TODO(m-kus): Update this value.
         CostTokenType::Bitwise => 583,
         CostTokenType::EcOp => 4085,
         CostTokenType::AddMod => 230,

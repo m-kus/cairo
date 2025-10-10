@@ -41,6 +41,7 @@ pub mod qm31;
 pub mod range;
 pub mod range_check;
 pub mod segment_arena;
+pub mod sha256;
 pub mod snapshot;
 pub mod span;
 pub mod squashed_felt252_dict;

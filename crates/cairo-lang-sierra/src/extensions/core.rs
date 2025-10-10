@@ -47,6 +47,7 @@ use super::qm31::{QM31Libfunc, QM31Type};
 use super::range::{IntRangeLibfunc, IntRangeType};
 use super::range_check::{RangeCheck96Type, RangeCheckType};
 use super::segment_arena::SegmentArenaType;
+use super::sha256::{Sha256Libfunc, Sha256Type};
 use super::snapshot::{SnapshotTakeLibfunc, SnapshotType};
 use super::span::SpanType;
 use super::squashed_felt252_dict::{SquashedFelt252DictLibfunc, SquashedFelt252DictType};
@@ -97,6 +98,7 @@ define_type_hierarchy! {
         SquashedFelt252Dict(SquashedFelt252DictType),
         Pedersen(PedersenType),
         Poseidon(PoseidonType),
+        Sha256(Sha256Type),
         Span(SpanType),
         Starknet(StarknetType),
         SegmentArena(SegmentArenaType),
@@ -152,6 +154,7 @@ define_libfunc_hierarchy! {
         Felt252SquashedDict(SquashedFelt252DictLibfunc),
         Pedersen(PedersenLibfunc),
         Poseidon(PoseidonLibfunc),
+        Sha256(Sha256Libfunc),
         Starknet(StarknetLibfunc),
         Debug(DebugLibfunc),
         SnapshotTake(SnapshotTakeLibfunc),

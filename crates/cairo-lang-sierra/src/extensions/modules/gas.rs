@@ -187,6 +187,8 @@ pub enum CostTokenType {
     Pedersen,
     /// One invocation of the Poseidon hades permutation.
     Poseidon,
+    /// One invocation of the SHA256 compress function.
+    Sha256,
     /// One invocation of the bitwise builtin.
     Bitwise,
     /// One invocation of the EC op builtin.
@@ -229,6 +231,7 @@ impl CostTokenType {
             CostTokenType::Bitwise => "bitwise",
             CostTokenType::EcOp => "ec_op",
             CostTokenType::Poseidon => "poseidon",
+            CostTokenType::Sha256 => "sha256",
             CostTokenType::AddMod => "add_mod",
             CostTokenType::MulMod => "mul_mod",
         }
@@ -253,9 +256,10 @@ impl CostTokenType {
             CostTokenType::Bitwise => 1,
             CostTokenType::EcOp => 2,
             CostTokenType::Poseidon => 3,
+            CostTokenType::Sha256 => 4,
             // TODO(ilya): Update the actual table.
-            CostTokenType::AddMod => 4,
-            CostTokenType::MulMod => 5,
+            CostTokenType::AddMod => 5,
+            CostTokenType::MulMod => 6,
         }
     }
 }

@@ -38,6 +38,7 @@ use cairo_lang_sierra::extensions::pedersen::PedersenConcreteLibfunc;
 use cairo_lang_sierra::extensions::poseidon::PoseidonConcreteLibfunc;
 use cairo_lang_sierra::extensions::qm31::QM31Concrete;
 use cairo_lang_sierra::extensions::range::IntRangeConcreteLibfunc;
+use cairo_lang_sierra::extensions::sha256::Sha256ConcreteLibfunc;
 use cairo_lang_sierra::extensions::starknet::StarknetConcreteLibfunc;
 use cairo_lang_sierra::extensions::starknet::testing::TestingConcreteLibfunc;
 use cairo_lang_sierra::extensions::structure::StructConcreteLibfunc;
@@ -312,6 +313,9 @@ pub fn core_libfunc_ap_change<InfoProvider: InvocationApChangeInfoProvider>(
         },
         Poseidon(libfunc) => match libfunc {
             PoseidonConcreteLibfunc::HadesPermutation(_) => vec![ApChange::Known(0)],
+        },
+        Sha256(libfunc) => match libfunc {
+            Sha256ConcreteLibfunc::Sha256Compress(_) => vec![ApChange::Known(0)],
         },
         Starknet(libfunc) => match libfunc {
             StarknetConcreteLibfunc::ClassHashConst(_)

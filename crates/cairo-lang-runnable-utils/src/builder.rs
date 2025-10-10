@@ -15,6 +15,7 @@ use cairo_lang_sierra::extensions::pedersen::PedersenType;
 use cairo_lang_sierra::extensions::poseidon::PoseidonType;
 use cairo_lang_sierra::extensions::range_check::{RangeCheck96Type, RangeCheckType};
 use cairo_lang_sierra::extensions::segment_arena::SegmentArenaType;
+use cairo_lang_sierra::extensions::sha256::Sha256Type;
 use cairo_lang_sierra::extensions::starknet::syscalls::SystemType;
 use cairo_lang_sierra::extensions::{ConcreteType, NamedType};
 use cairo_lang_sierra::ids::{ConcreteTypeId, GenericTypeId};
@@ -125,6 +126,7 @@ impl RunnableBuilder {
                 MulModType::ID,
                 PedersenType::ID,
                 PoseidonType::ID,
+                Sha256Type::ID,
                 RangeCheck96Type::ID,
                 RangeCheckType::ID,
                 SegmentArenaType::ID,
@@ -373,6 +375,7 @@ impl EntryCodeHelper {
             (BuiltinName::add_mod, AddModType::ID),
             (BuiltinName::range_check96, RangeCheck96Type::ID),
             (BuiltinName::poseidon, PoseidonType::ID),
+            (BuiltinName::sha256, Sha256Type::ID), // TODO(m-kus): Update to the correct position.
             (BuiltinName::ec_op, EcOpType::ID),
             (BuiltinName::bitwise, BitwiseType::ID),
             (BuiltinName::range_check, RangeCheckType::ID),

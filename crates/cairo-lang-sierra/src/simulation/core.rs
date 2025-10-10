@@ -264,6 +264,9 @@ pub fn simulate<
         CoreConcreteLibfunc::Poseidon(_) => {
             unimplemented!("Simulation of the Poseidon hash function is not implemented yet.");
         }
+        CoreConcreteLibfunc::Sha256(_) => {
+            unimplemented!("Simulation of the SHA256 hash function is not implemented yet.");
+        }
         CoreConcreteLibfunc::Starknet(_) => {
             unimplemented!("Simulation of the Starknet functionalities is not implemented yet.")
         }
