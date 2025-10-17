@@ -51,7 +51,6 @@ impl ExternalCodeSizeEstimator for RootDatabase {
                     // probably too large for inline so we can just return the max size.
                     return Ok(isize::MAX);
                 }
-
                 panic!("Failed to compile program to casm.");
             }
         };

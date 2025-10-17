@@ -438,7 +438,7 @@ pub fn core_libfunc_cost(
         },
         Sha256(libfunc) => match libfunc {
             Sha256ConcreteLibfunc::Sha256Compress(_) => vec![BranchCost::Regular {
-                const_cost: ConstCost::steps(2),
+                const_cost: ConstCost::steps(24),
                 pre_cost: PreCost::builtin(CostTokenType::Sha256),
             }],
         },

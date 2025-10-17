@@ -94,7 +94,7 @@ assert_matches = "1.5"
 bimap = "0.6.3"
 bincode = { version = "2", features = ["serde"] }
 cairo-lang-primitive-token = "1"
-cairo-vm = { git = "https://github.com/m-kus/cairo-vm.git", branch = "sha256", features = [
+cairo-vm = { git = "https://github.com/m-kus/cairo-vm.git", rev = "c50e0daa12c0eac1bde8c0a7a4154b99b4c40529", features = [
   "clap",
   "mod_builtin",
 ] }

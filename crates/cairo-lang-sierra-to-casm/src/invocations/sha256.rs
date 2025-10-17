@@ -3,7 +3,7 @@ use cairo_lang_casm::casm_build_extend;
 use cairo_lang_sierra::extensions::sha256::Sha256ConcreteLibfunc;
 
 use super::{CompiledInvocation, CompiledInvocationBuilder, InvocationError};
-use crate::invocations::add_input_variables;
+use crate::invocations::{CostValidationInfo, add_input_variables};
 
 /// Builds instructions for Sierra sha256 operations.
 pub fn build(
@@ -19,42 +19,28 @@ pub fn build(
 fn build_sha256_compress(
     builder: CompiledInvocationBuilder<'_>,
 ) -> Result<CompiledInvocation, InvocationError> {
-    let [sha256, state, message] = builder.try_get_single_cells()?;
-
+    let [sha256, state, message] = builder.try_get_refs()?;
+    let sha256 = sha256.try_unpack_single()?;
     let mut casm_builder = CasmBuilder::default();
     add_input_variables! {casm_builder,
-        buffer(8) state;
-        buffer(16) message;
-        buffer(31) sha256;
+        buffer(32) sha256;
     };
-    // Write state (8 words) and message (16 words) to the builtin segment as felts.
-    for _ in 0..8 {
-        casm_build_extend! {casm_builder,
-            tempvar tmp = *(state++);
-            assert tmp = *(sha256++);
-        };
+    for cell in &state.cells {
+        add_input_variables!(casm_builder, deref cell;);
+        casm_build_extend!(casm_builder, assert cell = *(sha256++););
     }
-    for _ in 0..16 {
-        casm_build_extend! {casm_builder,
-            tempvar tmp = *(message++);
-            assert tmp = *(sha256++);
-        };
+    for cell in &message.cells {
+        add_input_variables!(casm_builder, deref cell;);
+        casm_build_extend! {casm_builder, assert cell = *(sha256++); };
     }
-    // Allocate output (8 words) and write it to the builtin segment.
     casm_build_extend! {casm_builder,
-        tempvar output;
-        const state_size = 8;
-        hint AllocConstantSize { size: state_size } into { dst: output };
+        let output = sha256;
+        const output_size = 8;
+        let sha256_end = sha256 + output_size;
     };
-    for _ in 0..8 {
-        casm_build_extend! {casm_builder,
-            tempvar tmp = *(sha256++);
-            assert tmp = *(output++);
-        };
-    }
     Ok(builder.build_from_casm_builder(
         casm_builder,
-        [("Fallthrough", &[&[sha256], &[output]], None)],
-        Default::default(),
+        [("Fallthrough", &[&[sha256_end], &[output]], None)],
+        CostValidationInfo::default(),
     ))
 }
