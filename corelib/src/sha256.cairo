@@ -27,8 +27,17 @@ extern fn sha256_state_handle_init(state: Box<[u32; 8]>) -> Sha256StateHandle no
 /// Returns the final state of a SHA-256 hash computation.
 extern fn sha256_state_handle_digest(state: Sha256StateHandle) -> Box<[u32; 8]> nopanic;
 
+/// Sha256 builtin type.
+pub extern type Sha256;
+
+/// The Sha256 compress function, which takes a state and a message, and returns a
+/// new state.
+pub extern fn sha256_compress(
+    state: [u32; 8], msg: [u32; 16]
+) -> Box<[u32; 8]> implicits(Sha256) nopanic;
+
 /// Initial hash values for SHA-256 as specified in FIPS 180-4.
-const SHA256_INITIAL_STATE: [u32; 8] = [
+pub const SHA256_INITIAL_STATE: [u32; 8] = [
     0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
 ];
 

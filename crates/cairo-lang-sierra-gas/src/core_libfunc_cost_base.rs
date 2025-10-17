@@ -45,6 +45,7 @@ use cairo_lang_sierra::extensions::pedersen::PedersenConcreteLibfunc;
 use cairo_lang_sierra::extensions::poseidon::PoseidonConcreteLibfunc;
 use cairo_lang_sierra::extensions::qm31::QM31Concrete;
 use cairo_lang_sierra::extensions::range::IntRangeConcreteLibfunc;
+use cairo_lang_sierra::extensions::sha256::Sha256ConcreteLibfunc;
 use cairo_lang_sierra::extensions::structure::StructConcreteLibfunc;
 use cairo_lang_sierra::ids::ConcreteTypeId;
 use cairo_lang_sierra::program::Function;
@@ -433,6 +434,12 @@ pub fn core_libfunc_cost(
             PoseidonConcreteLibfunc::HadesPermutation(_) => vec![BranchCost::Regular {
                 const_cost: ConstCost::steps(3),
                 pre_cost: PreCost::builtin(CostTokenType::Poseidon),
+            }],
+        },
+        Sha256(libfunc) => match libfunc {
+            Sha256ConcreteLibfunc::Sha256Compress(_) => vec![BranchCost::Regular {
+                const_cost: ConstCost::steps(24),
+                pre_cost: PreCost::builtin(CostTokenType::Sha256),
             }],
         },
         Starknet(libfunc) => {

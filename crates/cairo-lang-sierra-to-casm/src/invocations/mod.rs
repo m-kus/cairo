@@ -60,6 +60,7 @@ mod poseidon;
 mod qm31;
 mod range;
 mod range_reduction;
+mod sha256;
 mod squashed_felt252_dict;
 mod starknet;
 mod structure;
@@ -707,6 +708,7 @@ pub fn compile_invocation(
         Felt252Dict(libfunc) => felt252_dict::build_dict(libfunc, builder),
         Pedersen(libfunc) => pedersen::build(libfunc, builder),
         Poseidon(libfunc) => poseidon::build(libfunc, builder),
+        Sha256(libfunc) => sha256::build(libfunc, builder),
         Starknet(libfunc) => starknet::build(libfunc, builder),
         Nullable(libfunc) => nullable::build(libfunc, builder),
         Debug(libfunc) => debug::build(libfunc, builder),

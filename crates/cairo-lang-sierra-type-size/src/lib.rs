@@ -48,6 +48,7 @@ pub fn get_type_size_map(
             | CoreTypeConcrete::Starknet(StarknetTypeConcrete::Sha256StateHandle(_))
             | CoreTypeConcrete::Pedersen(_)
             | CoreTypeConcrete::Poseidon(_)
+            | CoreTypeConcrete::Sha256(_)
             | CoreTypeConcrete::Felt252Dict(_)
             | CoreTypeConcrete::Felt252DictEntry(_)
             | CoreTypeConcrete::SegmentArena(_)
